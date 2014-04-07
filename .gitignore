@@ -1,0 +1,21 @@
+
+# Ignore project files in the root
+*.suo
+*.opensdf
+*.sdf
+*.xcodeproj
+*.user
+
+# Ignore all assets/data
+/Data/Meshes/**
+/Data/Shaders/**
+/Data/Textures/**
+
+# Intermediate created files
+/ipch/**
+
+# Ignore binary files
+/Binaries/Build/**
+
+# Ignore test applications 
+/Source/Applications/**

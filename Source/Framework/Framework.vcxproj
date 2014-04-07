@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core\Internal\Core.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Core\Internal\Hash.cpp" />
+    <ClCompile Include="Core\Internal\Ptr.cpp" />
+    <ClCompile Include="Engine\Internal\Game.cpp" />
+    <ClCompile Include="Engine\Internal\GameClient.cpp" />
+    <ClCompile Include="Engine\Internal\InputSystem.cpp" />
+    <ClCompile Include="Math\Internal\MathUtil.cpp" />
+    <ClCompile Include="Math\Internal\Matrix.cpp" />
+    <ClCompile Include="Math\Internal\Point.cpp" />
+    <ClCompile Include="Math\Internal\Vector.cpp" />
+    <ClCompile Include="Renderer\Internal\Buffer.cpp" />
+    <ClCompile Include="Renderer\Internal\DebugGeometryRenderer.cpp" />
+    <ClCompile Include="Renderer\Internal\Mesh.cpp" />
+    <ClCompile Include="Renderer\Internal\MeshLoad.cpp" />
+    <ClCompile Include="Renderer\Internal\RenderStates.cpp" />
+    <ClCompile Include="Renderer\Internal\RenderSystem.cpp" />
+    <ClCompile Include="Renderer\Internal\RenderTarget.cpp" />
+    <ClCompile Include="Renderer\Internal\ResourceManager.cpp" />
+    <ClCompile Include="Renderer\Internal\Shader.cpp" />
+    <ClCompile Include="Renderer\Internal\ShaderDrawBundle.cpp" />
+    <ClCompile Include="Renderer\Internal\Texture.cpp" />
+    <ClCompile Include="Renderer\Internal\VertexDeclaration.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Core\Public\Core.h" />
+    <ClInclude Include="Core\Public\Hash.h" />
+    <ClInclude Include="Core\Public\InitParams.h" />
+    <ClInclude Include="Core\Public\Ptr.h" />
+    <ClInclude Include="Core\Public\PtrTest.h" />
+    <ClInclude Include="Core\Public\StringUtils.h" />
+    <ClInclude Include="Engine\Public\Game.h" />
+    <ClInclude Include="Engine\Public\GameClient.h" />
+    <ClInclude Include="Engine\Public\InputSystem.h" />
+    <ClInclude Include="Engine\Public\Keys.h" />
+    <ClInclude Include="Math\Public\MathUtil.h" />
+    <ClInclude Include="Math\Public\Matrix.h" />
+    <ClInclude Include="Math\Public\Point.h" />
+    <ClInclude Include="Math\Public\Vector.h" />
+    <ClInclude Include="Renderer\Public\Buffer.h" />
+    <ClInclude Include="Renderer\Public\DebugGeometryRenderer.h" />
+    <ClInclude Include="Renderer\Public\Mesh.h" />
+    <ClInclude Include="Renderer\Public\RenderStates.h" />
+    <ClInclude Include="Renderer\Public\RenderSystem.h" />
+    <ClInclude Include="Renderer\Public\RenderSystemPrerequisites.h" />
+    <ClInclude Include="Renderer\Public\RenderTarget.h" />
+    <ClInclude Include="Renderer\Public\Resource.h" />
+    <ClInclude Include="Renderer\Public\ResourceManager.h" />
+    <ClInclude Include="Renderer\Public\Shader.h" />
+    <ClInclude Include="Renderer\Public\ShaderDrawBundle.h" />
+    <ClInclude Include="Renderer\Public\Texture.h" />
+    <ClInclude Include="Renderer\Public\VertexDeclaration.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Data\Shaders\debug.hlsl" />
+    <None Include="..\..\Data\Shaders\renderMesh.hlsl" />
+    <None Include="..\..\Data\Shaders\simple.hlsl" />
+    <None Include="..\..\Data\Shaders\terrain.hlsl" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D2F86336-A68C-4C4E-A316-3196408D94B2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Framework</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v110</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)\Binaries\Build\$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>$(SolutionDir)\Binaries\Build\obj\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <ExecutablePath>$(VCInstallDir)bin;$(ProgramFiles)\Windows Kits\8.0\bin\x86\NETFX 4.0 Tools;$(ProgramFiles)\Windows Kits\8.0\bin\x86;$(VSInstallDir)Common7\Tools\bin;$(VSInstallDir)Common7\tools;$(VSInstallDir)Common7\ide;$(ProgramFiles)\HTML Help Workshop;$(FrameworkSDKDir)\bin;$(MSBuildToolsPath32);$(VSInstallDir);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <IncludePath>$(ProgramFiles)\Windows Kits\8.0\Include\um;$(ProgramFiles)\Windows Kits\8.0\Include\shared;$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(FrameworkSDKDir)\include;</IncludePath>
+    <LibraryPath>$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(ProgramFiles)\Windows Kits\8.0\lib\win8\um\x86;$(FrameworkSDKDir)\lib</LibraryPath>
+    <ExcludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(ProgramFiles)\Windows Kits\8.0\Include\um;$(ProgramFiles)\Windows Kits\8.0\Include\shared;$(FrameworkSDKDir)\include;$(MSBuildToolsPath32);$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib;</ExcludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>Core\Public;Engine\Public;Math\Public;Renderer\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>Core.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

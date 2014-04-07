@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{2d8b276b-f686-4e81-bb95-ac7f83721a0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{3e7f2fac-8542-452a-8bfc-49a32c4f02bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{9c6b343a-ebba-497e-8eae-d424951bdce2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{4bf444e5-a33f-4e4e-9e35-f31566d51b7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Public">
+      <UniqueIdentifier>{10047d27-031a-452b-a058-59a45f863ba9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Public">
+      <UniqueIdentifier>{d6719cbb-b604-45c4-94dc-93d73087434c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Internal">
+      <UniqueIdentifier>{6bcc3e44-23b7-4e85-af1b-592b2f70e79e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Internal">
+      <UniqueIdentifier>{708f5e06-b0ba-4f5b-b3bb-b7c5759b4d83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Public">
+      <UniqueIdentifier>{7ecd440c-6cab-4ede-a16b-82a5611de859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math\Internal">
+      <UniqueIdentifier>{f4d8126a-5e71-427e-aea9-44751ef01ae8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Public">
+      <UniqueIdentifier>{ff5c7bf1-144e-4619-954b-d71300f624e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer\Internal">
+      <UniqueIdentifier>{371dd6cd-366e-4f9d-864d-d4ff352e4ca8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{e0ab971d-0f36-47ee-bfa3-7b784705231b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Test">
+      <UniqueIdentifier>{bc2df803-dd17-4ead-b24b-56da762c6eee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Engine\Internal\Game.cpp">
+      <Filter>Engine\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Internal\InputSystem.cpp">
+      <Filter>Engine\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Internal\Core.cpp">
+      <Filter>Core\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Internal\Hash.cpp">
+      <Filter>Core\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Internal\MathUtil.cpp">
+      <Filter>Math\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Internal\Matrix.cpp">
+      <Filter>Math\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Internal\Point.cpp">
+      <Filter>Math\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Internal\Vector.cpp">
+      <Filter>Math\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\Buffer.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\DebugGeometryRenderer.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\Mesh.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\RenderSystem.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\ResourceManager.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\Shader.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\Texture.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\RenderStates.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Internal\GameClient.cpp">
+      <Filter>Engine\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\MeshLoad.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Internal\Ptr.cpp">
+      <Filter>Core\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\VertexDeclaration.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\ShaderDrawBundle.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Internal\RenderTarget.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine\Public\Game.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Public\InputSystem.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Public\Core.h">
+      <Filter>Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Public\Hash.h">
+      <Filter>Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Public\InitParams.h">
+      <Filter>Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Public\StringUtils.h">
+      <Filter>Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Public\MathUtil.h">
+      <Filter>Math\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Public\Matrix.h">
+      <Filter>Math\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Public\Point.h">
+      <Filter>Math\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Public\Vector.h">
+      <Filter>Math\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\Buffer.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\DebugGeometryRenderer.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\Mesh.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\RenderSystem.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\Resource.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\ResourceManager.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\Shader.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\Texture.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Public\Keys.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\RenderStates.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Public\GameClient.h">
+      <Filter>Engine\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\RenderSystemPrerequisites.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Public\Ptr.h">
+      <Filter>Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Public\PtrTest.h">
+      <Filter>Core\Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\VertexDeclaration.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\ShaderDrawBundle.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Public\RenderTarget.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Data\Shaders\debug.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Data\Shaders\renderMesh.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Data\Shaders\simple.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Data\Shaders\terrain.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
