@@ -14,7 +14,7 @@ ResourceManager::~ResourceManager()
 Resource* ResourceManager::load(const String& fileName)
 {
   Resource* result = 0;
-  String name = StringUtils::stripDevice(fileName);
+  String name = PathUtils::getPath(fileName, true);
   uint32 resourceHash = crc32Hash((const ubyte*)name.c_str(), name.length());
   
   ResourceTable::iterator it = m_resources.find(resourceHash);

@@ -19,6 +19,8 @@
 
 #include <dxgi.h>
 #include <d3d11.h>
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dxgi.lib")
 #if defined (SUPPORT_RUNTIME_SHADER_COMPILE)
 # include <D3Dcompiler.h>
 # pragma comment(lib, "d3dcompiler.lib")

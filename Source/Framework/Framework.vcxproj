@@ -16,6 +16,7 @@
     </ClCompile>
     <ClCompile Include="Core\Internal\Hash.cpp" />
     <ClCompile Include="Core\Internal\Ptr.cpp" />
+    <ClCompile Include="Core\Internal\StringUtils.cpp" />
     <ClCompile Include="Engine\Internal\Game.cpp" />
     <ClCompile Include="Engine\Internal\GameClient.cpp" />
     <ClCompile Include="Engine\Internal\InputSystem.cpp" />
@@ -81,7 +82,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

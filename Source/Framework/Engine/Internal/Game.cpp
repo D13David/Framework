@@ -87,7 +87,7 @@ void Game::run()
       m_inputSystem->tick(0);
 
 #if defined (_DEBUG)
-      m_debugGeomRenderer->prepareDebugRendering();
+      //m_debugGeomRenderer->prepareDebugRendering();
 #endif // _DEBUG
 
       m_client->tick(0);
@@ -99,7 +99,7 @@ void Game::run()
       Matrix4 proj;
       Matrix4 view;
       //getViewParameters(view, proj);
-      m_debugGeomRenderer->drawAllDebugGeometry(view, proj);
+      //m_debugGeomRenderer->drawAllDebugGeometry(view, proj);
 #endif // _DEBUG
 
       m_renderSystem->endFrame();
@@ -162,7 +162,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     g_Game->getInputSystem()->onKeyDown(wParam, (lParam & 0xf) != 0);
     break;
   case WM_KEYUP:
-    printf("WM_KEYUP\n");
     g_Game->getInputSystem()->onKeyUp(wParam);
     break;
   

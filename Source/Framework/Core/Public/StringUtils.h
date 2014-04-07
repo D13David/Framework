@@ -21,26 +21,14 @@ public:
 
     return true;
   }
+};
 
-  static String stripFileName(const String& str)
-  {
-    const char* begin = str.c_str();
-    const char* p = begin + str.length() - 1;
-    while (p >= begin && *p != '\\')
-      --p;
-    
-    return String(begin, p - begin + 1);
-  }
-
-  static String stripDevice(const String& str)
-  {
-    const char* p = str.c_str();
-
-    while (*p && *p != ':')
-      ++p;
-
-    return String(p, str.length() -  (p - str.c_str()));
-  }
+class PathUtils
+{
+public:
+  static String getExtension(const String& path);
+  static String getFilename(const String& path, bool stripExtension);
+  static String getPath(const String& path, bool stripDevice);
 };
 
 #endif // __StringUtils_h_

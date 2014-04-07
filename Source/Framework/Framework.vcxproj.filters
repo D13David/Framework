@@ -111,6 +111,9 @@
     <ClCompile Include="Renderer\Internal\RenderTarget.cpp">
       <Filter>Renderer\Internal</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Internal\StringUtils.cpp">
+      <Filter>Core\Internal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Public\Game.h">

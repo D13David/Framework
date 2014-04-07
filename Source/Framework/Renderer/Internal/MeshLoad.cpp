@@ -30,7 +30,7 @@ bool Mesh::loadFromObj(const String& filename, Mesh& mesh)
   if (!readRawBlob(filename, data))
     return false;
 
-  String path = StringUtils::stripFileName(filename);
+  String path = PathUtils::getPath(filename, false);
 
   String materialLib;
   std::vector<float> positions;
