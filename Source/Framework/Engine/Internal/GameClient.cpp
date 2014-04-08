@@ -29,7 +29,7 @@ DefaultGameMode::DefaultGameMode()
   : m_viewYaw(0)
   , m_viewPitch(0)
 {
-  m_viewPos = Vector3(0, 100, 1000);
+  m_viewPos = Vector3(0, 100, -1000);
   m_viewMatrix = Matrix4::Identity;
   makePerspectiveProjMatrix(m_projectionMatrix, 60.0f * DEG2RAD, (float)1024.0f / 768.0f, 10.0f, 50000.0f);
 }
@@ -69,14 +69,14 @@ void DefaultGameMode::handleUserInput()
     {
       if (inputSystem->isKeyDown(Keys::RightMouseButton))
       {
-        m_viewPitch -= angularMovementY;
-        m_viewYaw -= angularMovementX;
+        m_viewPitch += angularMovementY;
+        m_viewYaw += angularMovementX;
       }
 
       if (inputSystem->isKeyDown(Keys::LeftMouseButton))
       {
         moveSpeedForward += CameraMoveSpeed * angularMovementY;
-        m_viewYaw -= angularMovementX;
+        m_viewYaw += angularMovementX;
       }
     }
 
@@ -112,7 +112,7 @@ void DefaultGameMode::handleUserInput()
   makeRotateY(rotateYaw, m_viewYaw * DEG2RAD);
 
   Matrix4 orientation = rotatePitch * rotateYaw;
-  Vector3 cameraForward = -Vector3(orientation[8], orientation[9], orientation[10]);
+  Vector3 cameraForward = Vector3(orientation[8], orientation[9], orientation[10]);
   Vector3 cameraUp = Vector3(orientation[4], orientation[5], orientation[6]);
   Vector3 cameraRight = Vector3(orientation[0], orientation[1], orientation[2]);
 

@@ -1,9 +1,6 @@
 #ifndef __MathUtil_h_
 #define __MathUtil_h_
 
-class Matrix4;
-class Vector3;
-
 #undef max
 
 static const float PI = 3.14159265f;
@@ -13,7 +10,7 @@ static const float DEG2RAD = PI / 180.0f;
 static const float RAD2DEG = 180.0f / PI;
 static const float EPSILON = 1e-6f;
 
-void makePerspectiveProjMatrix(Matrix4& mat, float fovy, float aspect, float zn, float zf);
+void makePerspectiveProjMatrix(Matrix4& mat, float fovy, float aspect, float zNear, float zFar);
 void makeTranslation(Matrix4& mat, float x, float y, float z);
 void makeLookAt(Matrix4& mat, const Vector3& origin, const Vector3& targetPoint, const Vector3& up);
 

@@ -30,8 +30,9 @@ private:
   ID3D11InputLayout* m_inputLayout;
   DebugVertex* m_mappedMemory;
   DebugVertex* m_nextVertex;
-  Shader* m_vertexShader;
-  Shader* m_pixelShader;
+  SharedPtr<VertexShader> m_vertexShader;
+  SharedPtr<PixelShader> m_pixelShader;
+  SharedPtr<VertexDeclaration> m_vertexDeclaration;
 };
 
 #endif // __DebugGeometryRenderer_h_

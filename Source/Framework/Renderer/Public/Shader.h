@@ -40,8 +40,6 @@ public:
   void init(const DataBlob& data);
   void destroy();
 
-  void bindToPipeline();
-
   // paramter interface
   void setParamByName(const String& name, float value);
   void setParamByName(const String& name, float value1, float value2);
@@ -50,15 +48,15 @@ public:
   void setParamByName(const String& name, const float* value, uint32 size);
   void beginUpdateParameters();
   void endUpdateParameters();
+  uint32 queryBuffersArray(ID3D11Buffer* const*& m_buffersToBind) const;
 
 protected:
-  virtual bool _createShaderResource(const void* byteCode, uint32 byteCodeLen) = 0;
-  virtual void _bind(ID3D11Buffer* const* buffers, uint32 numBuffers) = 0;
+  virtual bool createShaderResource(const void* byteCode, uint32 byteCodeLen) = 0;
 
 private:
-  void _allocateCBuffer(uint32 index, uint32 size);
-  void _destroyCBuffer(uint32 index);
-  ubyte* _getParameterPointer(const String& name);
+  void allocateCBuffer(uint32 index, uint32 size);
+  void destroyCBuffer(uint32 index);
+  ubyte* getParameterPointer(const String& name);
 
   ShaderParameterArray m_parameters;
   ShaderInputParameterArray m_inputSignature;
@@ -87,8 +85,7 @@ public:
   uint32 getCodeSize()  const { return m_code.getSize(); }
 
 protected:
-  virtual bool _createShaderResource(const void* byteCode, uint32 byteCodeLen);
-  virtual void _bind(ID3D11Buffer* const* buffers, uint32 numBuffers);
+  virtual bool createShaderResource(const void* byteCode, uint32 byteCodeLen);
 
 private:
   DataBlob m_code;
@@ -104,8 +101,7 @@ public:
   ID3D11PixelShader* getResourcePtr() const { return m_resource; }
 
 protected:
-  virtual bool _createShaderResource(const void* byteCode, uint32 byteCodeLen);
-  virtual void _bind(ID3D11Buffer* const* buffers, uint32 numBuffers);
+  virtual bool createShaderResource(const void* byteCode, uint32 byteCodeLen);
 
 private:
   ID3D11PixelShader* m_resource;

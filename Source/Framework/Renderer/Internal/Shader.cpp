@@ -16,7 +16,7 @@ Shader::~Shader()
 
 void Shader::init(const DataBlob& data)
 {
-  if (!_createShaderResource(data.getPtr(), data.getSize()))
+  if (!createShaderResource(data.getPtr(), data.getSize()))
     return;
 
   ID3D11ShaderReflection* reflector = 0;
@@ -39,7 +39,7 @@ void Shader::init(const DataBlob& data)
       if (bufferDesc.Type != D3D11_CT_CBUFFER)
         continue;
 
-      _allocateCBuffer(i, bufferDesc.Size);
+      allocateCBuffer(i, bufferDesc.Size);
 
       for (uint32 paramIdx = 0; paramIdx < bufferDesc.Variables; ++paramIdx)
       {
@@ -111,24 +111,19 @@ void Shader::init(const DataBlob& data)
 void Shader::destroy()
 {
   for (uint32 i = 0; i < MAX_CONSTANT_BUFFERS; ++i)
-    _destroyCBuffer(i);
-}
-
-void Shader::bindToPipeline()
-{
-  _bind(m_buffersToBind, m_maxSlot);
+    destroyCBuffer(i);
 }
 
 void Shader::setParamByName(const String& name, float value)
 {
-  float* ptr = (float*)_getParameterPointer(name);
+  float* ptr = (float*)getParameterPointer(name);
   ASSERT(ptr, "parameter not found");
   *ptr = value;
 }
 
 void Shader::setParamByName(const String& name, float value1, float value2)
 {
-  float* ptr = (float*)_getParameterPointer(name);
+  float* ptr = (float*)getParameterPointer(name);
   ASSERT(ptr, "parameter not found");
   *ptr++ = value1;
   *ptr++ = value2;
@@ -136,7 +131,7 @@ void Shader::setParamByName(const String& name, float value1, float value2)
 
 void Shader::setParamByName(const String& name, float value1, float value2, float value3)
 {
-  float* ptr = (float*)_getParameterPointer(name);
+  float* ptr = (float*)getParameterPointer(name);
   ASSERT(ptr, "parameter not found");
   *ptr++ = value1;
   *ptr++ = value2;
@@ -145,7 +140,7 @@ void Shader::setParamByName(const String& name, float value1, float value2, floa
 
 void Shader::setParamByName(const String& name, float value1, float value2, float value3, float value4)
 {
-  float* ptr = (float*)_getParameterPointer(name);
+  float* ptr = (float*)getParameterPointer(name);
   ASSERT(ptr, "parameter not found");
   *ptr++ = value1;
   *ptr++ = value2;
@@ -180,17 +175,23 @@ void Shader::endUpdateParameters()
   }
 }
 
+uint32 Shader::queryBuffersArray(ID3D11Buffer* const *& buffersToBind) const
+{
+  buffersToBind = m_buffersToBind;
+  return m_maxSlot;
+}
+
 void Shader::setParamByName(const String& name, const float* value, uint32 size)
 {
-  float* ptr = (float*)_getParameterPointer(name);
+  float* ptr = (float*)getParameterPointer(name);
   ASSERT(ptr, "parameter not found");
   memcpy(ptr, value, size);
 }
 
-void Shader::_allocateCBuffer(uint32 index, uint32 size)
+void Shader::allocateCBuffer(uint32 index, uint32 size)
 {
   ASSERT(index < MAX_CONSTANT_BUFFERS, "index out of range");
-  _destroyCBuffer(index);
+  destroyCBuffer(index);
   if (size > 0)
   {
     size = (size + 15) & ~15;
@@ -212,7 +213,7 @@ void Shader::_allocateCBuffer(uint32 index, uint32 size)
   }
 }
 
-void Shader::_destroyCBuffer(uint32 index)
+void Shader::destroyCBuffer(uint32 index)
 {
   ASSERT(index < MAX_CONSTANT_BUFFERS, "index out of range");
   cbuffer& ptr = m_cbuffers[index];
@@ -225,7 +226,7 @@ void Shader::_destroyCBuffer(uint32 index)
   }
 }
 
-ubyte* Shader::_getParameterPointer(const String& name)
+ubyte* Shader::getParameterPointer(const String& name)
 {
   ShaderParameter* param = 0;
 
@@ -259,7 +260,7 @@ VertexShader::~VertexShader()
   SAFE_RELEASE(m_resource);
 }
 
-bool VertexShader::_createShaderResource(const void* byteCode, uint32 byteCodeLen)
+bool VertexShader::createShaderResource(const void* byteCode, uint32 byteCodeLen)
 {
   WeakPtr<RenderSystem> renderSys = g_Game->getRenderSystem();
   VALIDATE(renderSys->getDevicePtr()->CreateVertexShader(byteCode, byteCodeLen, NULL, &m_resource));
@@ -273,17 +274,6 @@ bool VertexShader::_createShaderResource(const void* byteCode, uint32 byteCodeLe
   return true;
 }
 
-void VertexShader::_bind(ID3D11Buffer* const* buffers, uint32 numBuffers)
-{
-  WeakPtr<RenderSystem> renderSys = g_Game->getRenderSystem();
-  if (numBuffers > 0)
-  {
-    renderSys->getDeviceContextPtr()->VSSetConstantBuffers(0, numBuffers, buffers);
-  }
-
-  renderSys->getDeviceContextPtr()->VSSetShader(m_resource, NULL, 0);
-}
-
 PixelShader::PixelShader()
 {
 }
@@ -293,20 +283,9 @@ PixelShader::~PixelShader()
   SAFE_RELEASE(m_resource);
 }
 
-bool PixelShader::_createShaderResource(const void* byteCode, uint32 byteCodeLen)
+bool PixelShader::createShaderResource(const void* byteCode, uint32 byteCodeLen)
 {
   WeakPtr<RenderSystem> renderSys = g_Game->getRenderSystem();
   VALIDATE(renderSys->getDevicePtr()->CreatePixelShader(byteCode, byteCodeLen, NULL, &m_resource));
   return true;
-}
-
-void PixelShader::_bind(ID3D11Buffer* const* buffers, uint32 numBuffers)
-{
-  WeakPtr<RenderSystem> renderSys = g_Game->getRenderSystem();
-  if (numBuffers > 0)
-  {
-    renderSys->getDeviceContextPtr()->PSSetConstantBuffers(0, numBuffers, buffers);
-  }
-
-  renderSys->getDeviceContextPtr()->PSSetShader(m_resource, NULL, 0);
 }

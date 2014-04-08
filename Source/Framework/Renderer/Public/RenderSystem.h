@@ -4,6 +4,18 @@
 #include "RenderSystemPrerequisites.h"
 #include "Texture.h" // Manager
 
+class PipelineStateCache;
+
+#if defined (SUPPORT_GPU_DEBUG_MARKERS)
+# define GPU_DEBUG_EVENT_PUSH(msg) { g_Game->getRenderSystem()->debugEventPush((msg), 0); }
+# define GPU_DEBUG_EVENT_POP() { g_Game->getRenderSystem()->debugEventPop(); }
+# define GPU_DEBUG_MARKER(msg) { g_Game->getRenderSystem()->debugMarker((msg), 0); }
+#else
+# define GPU_DEBUG_EVENT_PUSH(msg)
+# define GPU_DEBUG_EVENT_POP(msg)
+# define GPU_DEBUG_MARKER(msg)
+#endif // SUPPORT_GPU_DEBUG_MARKERS
+
 class RenderSystem
 {
 public:
@@ -20,6 +32,8 @@ public:
   void bindRenderTarget(uint32 slot, const SharedPtr<RenderTarget>& renderTarget);
   void endRenderTargetSetup();
 
+  void setShaderDrawBundle(const ShaderDrawBundle* shaderDrawBundle);
+
   ID3D11Device* getDevicePtr() const { return m_device; }
   ID3D11DeviceContext* getDeviceContextPtr() const { return m_renderContext; }
 
@@ -27,6 +41,13 @@ public:
 
   // render state api
   void setRasterizerState(ID3D11RasterizerState* rasterizerState);
+  void setDepthStencilState(ID3D11DepthStencilState* depthStencilState, uint8 stencilRef = 0xff);
+  void setViewport(float width, float height, float topLeftX = 0.0f, float topLeftY = 0.0f, float minZ = 0.0f, float maxZ = 1.0f);
+
+  // debugging
+  void debugEventPush(const char* name, uint32 color);
+  void debugEventPop();
+  void debugMarker(const char* name, uint32 color);
 
 private:
   void createFrameBuffer();
@@ -43,14 +64,13 @@ private:
 
   bool m_isFullScreen;
 
-  //// pipeline state //
+  //// pipeline state
   SharedPtr<RenderTarget> m_boundRenderTargets[MAX_RENDER_TARGETS];
   SharedPtr<RenderTarget> m_boundDepthStencilTarget;
-  uint32 m_renderTargetDirtyMask;
-  ////
 
   // managers
   TextureManager m_textureManager;
+  PipelineStateCache* m_stateCache;
 };
 
 class ShaderCompiler

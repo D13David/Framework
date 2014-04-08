@@ -38,13 +38,6 @@ ShaderDrawBundle::~ShaderDrawBundle()
   SAFE_RELEASE(m_inputLayout);
 }
 
-void ShaderDrawBundle::bindToPipeline()
-{
-  m_vertexShader->bindToPipeline();
-  m_pixelShader->bindToPipeline();
-  RENDER_CONTEXT->IASetInputLayout(m_inputLayout);
-}
-
 SharedPtr<ShaderDrawBundle> ShaderDrawBundle::createShaderDrawBundle(SharedPtr<VertexShader> vertexShader, SharedPtr<PixelShader> pixelShader, SharedPtr<const VertexDeclaration> vertexDeclaration)
 {
   // FIXME: cache this array

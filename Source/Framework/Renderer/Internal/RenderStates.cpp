@@ -100,6 +100,31 @@ D3D11_COMPARISON_FUNC mapComparisonFunc(eComparisonFunc cmpFunc)
   return D3D11_COMPARISON_NEVER;
 }
 
+D3D11_STENCIL_OP mapStencilOp(eStencilOp stencilOp)
+{
+  switch (stencilOp)
+  {
+  case SO_STENCIL_OP_KEEP:
+    return D3D11_STENCIL_OP_KEEP;
+  case SO_STENCIL_OP_ZERO:
+    return D3D11_STENCIL_OP_ZERO;
+  case SO_STENCIL_OP_REPLACE:
+    return D3D11_STENCIL_OP_REPLACE;
+  case SO_STENCIL_OP_INCR_SAT:
+    return D3D11_STENCIL_OP_INCR_SAT;
+  case SO_STENCIL_OP_DECR_SAT:
+    return D3D11_STENCIL_OP_DECR_SAT;
+  case SO_STENCIL_OP_INVERT:
+    return D3D11_STENCIL_OP_INVERT;
+  case SO_STENCIL_OP_INCR:
+    return D3D11_STENCIL_OP_INCR;
+  case SO_STENCIL_OP_DECR:
+    return D3D11_STENCIL_OP_DECR;
+  }
+
+  return D3D11_STENCIL_OP_KEEP;
+}
+
 ID3D11RasterizerState* createRasterizerState(eFillMode fillMode, eCullMode cullMode, 
   bool frontCounterClockwise, bool depthClipEnable, bool scissorEnable, bool multisampleEnable)
 {
@@ -134,5 +159,30 @@ ID3D11SamplerState* createSamplerState(eSampleFilter filter, eSampleAddress addr
 
   ID3D11SamplerState* result = 0;
   VALIDATE(RENDER_DEVICE->CreateSamplerState(&desc, &result));
+  return result;
+}
+
+ID3D11DepthStencilState* createDepthStencilState(bool depthEnabled, bool depthWriteEnabled, eComparisonFunc depthFunc, bool stencilEnabled, uint32 stencilReadMask, 
+  uint32 stencilWriteMask, eStencilOp stencilFailOpFront, eStencilOp stencilDepthFailOpFront, eStencilOp stencilPassOpFront, eComparisonFunc stencilFuncFront,
+  eStencilOp stencilFailOpBack, eStencilOp stencilDepthFailOpBack, eStencilOp stencilPassOpBack, eComparisonFunc stencilFuncBack)
+{
+  CD3D11_DEPTH_STENCIL_DESC desc;
+  desc.DepthEnable = depthEnabled ? TRUE : FALSE;
+  desc.DepthWriteMask = depthWriteEnabled ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+  desc.DepthFunc = mapComparisonFunc(depthFunc);
+  desc.StencilEnable = stencilEnabled ? TRUE : FALSE;
+  desc.StencilReadMask = stencilReadMask;
+  desc.StencilWriteMask = stencilWriteMask;
+  desc.FrontFace.StencilFailOp = mapStencilOp(stencilFailOpFront);
+  desc.FrontFace.StencilDepthFailOp = mapStencilOp(stencilDepthFailOpFront);
+  desc.FrontFace.StencilPassOp = mapStencilOp(stencilPassOpFront);
+  desc.FrontFace.StencilFunc = mapComparisonFunc(stencilFuncFront);
+  desc.BackFace.StencilFailOp = mapStencilOp(stencilFailOpBack);
+  desc.BackFace.StencilDepthFailOp = mapStencilOp(stencilDepthFailOpBack);
+  desc.BackFace.StencilPassOp = mapStencilOp(stencilPassOpBack);
+  desc.BackFace.StencilFunc = mapComparisonFunc(stencilFuncBack);
+
+  ID3D11DepthStencilState* result = 0;
+  VALIDATE(RENDER_DEVICE->CreateDepthStencilState(&desc, &result));
   return result;
 }

@@ -3,12 +3,13 @@
 #include "Game.h"
 #include "RenderSystem.h"
 #include "Shader.h"
+#include "VertexDeclaration.h"
+#include "ShaderDrawBundle.h"
+#include "RenderStates.h"
 
 DebugGeometryRenderer::DebugGeometryRenderer()
   : m_vertexBuffer(0)
   , m_inputLayout(0)
-  , m_vertexShader(0)
-  , m_pixelShader(0)
 {
 }
 
@@ -38,14 +39,23 @@ void DebugGeometryRenderer::init()
     m_vertexShader = new VertexShader();
     m_vertexShader->init(buffer);
 
-    D3D11_INPUT_ELEMENT_DESC desc[] = 
+    /*D3D11_INPUT_ELEMENT_DESC desc[] = 
     {
       { "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
       { "Color", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
     };
 
-    VALIDATE(renderSys->getDevicePtr()->CreateInputLayout(desc, 2, buffer.getPtr(), buffer.getSize(), &m_inputLayout));
+    VALIDATE(renderSys->getDevicePtr()->CreateInputLayout(desc, 2, buffer.getPtr(), buffer.getSize(), &m_inputLayout));*/
   }
+
+  m_vertexDeclaration = new VertexDeclaration();
+
+  uint32 offset = 0;
+  VertexElement element = m_vertexDeclaration->add("Position", 0, VEF_FLOAT3, 0, offset, false);
+  offset += VertexDeclaration::sizeOfElementType(element.format);
+
+  element = m_vertexDeclaration->add("Color", 0, VEF_COLOR, 0, offset, false);
+  offset += VertexDeclaration::sizeOfElementType(element.format);
 
   if (ShaderCompiler::compile("Data\\Shaders\\debug.hlsl", "ps_main", "ps_5_0", buffer))
   {
@@ -56,8 +66,6 @@ void DebugGeometryRenderer::init()
 
 void DebugGeometryRenderer::shutdown()
 {
-  delete m_vertexShader;
-  delete m_pixelShader;
   SAFE_RELEASE(m_vertexBuffer);
   SAFE_RELEASE(m_inputLayout);
 }
@@ -78,6 +86,7 @@ void DebugGeometryRenderer::prepareDebugRendering()
 
 void DebugGeometryRenderer::drawAllDebugGeometry(const Matrix4& view, const Matrix4& proj)
 {
+  GPU_DEBUG_EVENT_PUSH("Debug Geometry Pass");
   WeakPtr<RenderSystem> renderSys = g_Game->getRenderSystem();
 
   if (m_mappedMemory)
@@ -90,15 +99,18 @@ void DebugGeometryRenderer::drawAllDebugGeometry(const Matrix4& view, const Matr
   m_vertexShader->setParamByName("modelMat", view.getPtr(), sizeof(float)*16);
   m_vertexShader->endUpdateParameters();
 
+  g_Game->getRenderSystem()->setDepthStencilState(DepthStencilState<false, false>::get());
+
+  SharedPtr<ShaderDrawBundle> shaderDrawBundle = ShaderDrawBundle::createShaderDrawBundle(m_vertexShader, m_pixelShader, m_vertexDeclaration);
+  g_Game->getRenderSystem()->setShaderDrawBundle(shaderDrawBundle.get());
+
   UINT strides = sizeof(DebugVertex);
   UINT offsets = 0;
   renderSys->getDeviceContextPtr()->IASetVertexBuffers(0, 1, &m_vertexBuffer, &strides, &offsets);
   renderSys->getDeviceContextPtr()->IASetIndexBuffer(0, DXGI_FORMAT_UNKNOWN, 0);
   renderSys->getDeviceContextPtr()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-  renderSys->getDeviceContextPtr()->IASetInputLayout(m_inputLayout);
-  m_vertexShader->bindToPipeline();
-  m_pixelShader->bindToPipeline();
   renderSys->getDeviceContextPtr()->Draw(m_nextVertex - m_mappedMemory, 0);
+  GPU_DEBUG_EVENT_POP();
 }
 
 void DebugGeometryRenderer::drawLine(const Vector3& pos1, const Vector3& pos2, uint32 color)

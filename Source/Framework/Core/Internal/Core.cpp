@@ -41,6 +41,23 @@ long fileSize(FILE* fp)
   return size;
 }
 
+String getCurrentDirectory()
+{
+  String result;
+  char path[MAX_PATH] = {0};
+  if (GetCurrentDirectory(MAX_PATH, path) != 0)
+  {
+    result = path;
+  }
+
+  return result;
+}
+
+void setCurrentDirectory(const String& path)
+{
+  SetCurrentDirectory(path.c_str());
+}
+
 bool readRawBlob(const String& fileName, DataBlob& data)
 {
   bool result = false;
@@ -60,6 +77,20 @@ bool readRawBlob(const String& fileName, DataBlob& data)
   }
 
   return result;
+}
+
+bool readAllFile(const String& fileName, String& result)
+{
+  DataBlob data;
+  if (readRawBlob(fileName, data))
+  {
+    result = String((String::value_type*)data.getPtr(),
+      (String::value_type*)((ubyte*)data.getPtr() + data.getSize()));
+
+    return true;
+  }
+
+  return false;
 }
 
 uint16 readUInt16(const ubyte*& ptr)

@@ -13,12 +13,14 @@
 
 #define SUPPORT_RUNTIME_SHADER_COMPILE
 
+#define SUPPORT_GPU_DEBUG_MARKERS
+
 // windows/dx
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include <dxgi.h>
-#include <d3d11.h>
+#include <d3d11_1.h>
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #if defined (SUPPORT_RUNTIME_SHADER_COMPILE)
@@ -29,6 +31,7 @@
 
 typedef std::string String;
 
+typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
 typedef unsigned char ubyte;
@@ -50,7 +53,10 @@ private:
 };
 
 long fileSize(FILE* fp);
+String getCurrentDirectory();
+void setCurrentDirectory(const String& path);
 bool readRawBlob(const String& fileName, DataBlob& data);
+bool readAllFile(const String& fileName, String& result);
 uint16 readUInt16(const ubyte*& ptr);
 uint32 readUInt32(const ubyte*& ptr);
 
@@ -86,6 +92,7 @@ class PixelShader;
 class RenderSystem;
 class RenderTarget;
 class Shader;
+class ShaderDrawBundle;
 class Texture;
 class VertexDeclaration;
 class VertexShader;

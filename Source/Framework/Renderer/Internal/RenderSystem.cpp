@@ -2,7 +2,150 @@
 #include "RenderSystem.h"
 #include "RenderTarget.h"
 #include "InitParams.h"
+#include "ShaderDrawBundle.h"
+#include "Shader.h"
 
+#if defined (SUPPORT_GPU_DEBUG_MARKERS)
+# include <d3d9.h>
+# pragma comment(lib, "d3d9.lib")
+#endif // SUPPORT_GPU_DEBUG_MARKERS
+
+class PipelineStateCache
+{
+public:
+  PipelineStateCache(ID3D11DeviceContext* deviceContext);
+
+  void setRenderTargets(uint32 numViews, ID3D11RenderTargetView* const * renderTargetViews, ID3D11DepthStencilView* depthStencilView);
+  void setRasterizerState(ID3D11RasterizerState* rasterizerState);
+  void depthStencilState(ID3D11DepthStencilState* depthStencilState, uint8 stencilRef);
+  void setVertexShader(const VertexShader& vertexShader);
+  void setPixelShader(const PixelShader& pixelShader);
+  void setInputLayout(ID3D11InputLayout* inputLayout);
+  void setViewport(D3D11_VIEWPORT viewport);
+
+private:
+  ID3D11DeviceContext* m_deviceContext;
+
+  // currently bound render targets
+  ID3D11RenderTargetView* m_currentlyBoundRTV[MAX_RENDER_TARGETS];
+  ID3D11DepthStencilView* m_currentlyBoundDSV;
+
+  // currently bound state objects
+  ID3D11RasterizerState* m_currentRasterizerState;
+  ID3D11DepthStencilState* m_currentDepthStencilState;
+  ID3D11InputLayout* m_currentInputLayout;
+
+  // current shader state
+  ID3D11VertexShader* m_currentVertexShader;
+  ID3D11PixelShader* m_currentPixelShader;
+
+  uint32 m_stencilRef;
+  D3D11_VIEWPORT m_currentViewport;
+};
+
+PipelineStateCache::PipelineStateCache(ID3D11DeviceContext* deviceContext)
+  : m_deviceContext(deviceContext)
+  , m_currentlyBoundDSV(0)
+  , m_currentRasterizerState(0)
+  , m_currentDepthStencilState(0)
+  , m_currentInputLayout(0)
+  , m_currentVertexShader(0)
+  , m_currentPixelShader(0)
+  , m_stencilRef(0xff)
+{
+  ASSERT(m_deviceContext != 0, "no valid device context");
+  memset(m_currentlyBoundRTV, 0, sizeof(m_currentlyBoundRTV));
+  memset(&m_currentViewport, 0, sizeof(m_currentViewport));
+}
+
+void PipelineStateCache::setRenderTargets(uint32 numViews, ID3D11RenderTargetView* const * renderTargetViews, ID3D11DepthStencilView* depthStencilView)
+{
+  bool hasChanges = false;
+
+  for (uint32 i = 0; i < MAX_RENDER_TARGETS; ++i)
+  {
+    hasChanges |= renderTargetViews[i] != m_currentlyBoundRTV[i];
+    m_currentlyBoundRTV[i] = renderTargetViews[i];
+  }
+
+  if (depthStencilView != m_currentlyBoundDSV)
+  {
+    hasChanges = true;
+    m_currentlyBoundDSV = depthStencilView;
+  }
+
+  if (hasChanges)
+  {
+    m_deviceContext->OMSetRenderTargets(numViews, m_currentlyBoundRTV, m_currentlyBoundDSV);
+  }
+}
+
+void PipelineStateCache::setRasterizerState(ID3D11RasterizerState* rasterizerState)
+{
+  if (rasterizerState != m_currentRasterizerState)
+  {
+    m_currentRasterizerState = rasterizerState;
+    m_deviceContext->RSSetState(m_currentRasterizerState);
+  }
+}
+
+void PipelineStateCache::depthStencilState(ID3D11DepthStencilState* depthStencilState, uint8 stencilRef)
+{
+  if (depthStencilState != m_currentDepthStencilState || m_stencilRef != stencilRef)
+  {
+    m_currentDepthStencilState = depthStencilState;
+    m_deviceContext->OMSetDepthStencilState(depthStencilState, stencilRef);
+  }
+}
+
+void PipelineStateCache::setVertexShader(const VertexShader& vertexShader)
+{
+  // FIXME: cache this
+  ID3D11Buffer* const* constantBuffers;
+  uint32 numConstantBuffers = vertexShader.queryBuffersArray(constantBuffers);
+  m_deviceContext->VSSetConstantBuffers(0, numConstantBuffers, constantBuffers);
+
+  ID3D11VertexShader* shaderResourcePtr = vertexShader.getResourcePtr();
+  if (shaderResourcePtr != m_currentVertexShader)
+  {
+    m_currentVertexShader = shaderResourcePtr;
+    m_deviceContext->VSSetShader(shaderResourcePtr, NULL, 0);
+  }
+}
+
+void PipelineStateCache::setPixelShader(const PixelShader& pixelShader)
+{
+  // FIXME: cache this
+  ID3D11Buffer* const* constantBuffers;
+  uint32 numConstantBuffers = pixelShader.queryBuffersArray(constantBuffers);
+  m_deviceContext->PSSetConstantBuffers(0, numConstantBuffers, constantBuffers);
+
+  ID3D11PixelShader* shaderResourcePtr = pixelShader.getResourcePtr();
+  if (shaderResourcePtr != m_currentPixelShader)
+  {
+    m_currentPixelShader = shaderResourcePtr;
+    m_deviceContext->PSSetShader(shaderResourcePtr, NULL, 0);
+  }
+}
+
+void PipelineStateCache::setInputLayout(ID3D11InputLayout* inputLayout)
+{
+  if (inputLayout != m_currentInputLayout)
+  {
+    m_currentInputLayout = inputLayout;
+    m_deviceContext->IASetInputLayout(inputLayout);
+  }
+}
+
+void PipelineStateCache::setViewport(D3D11_VIEWPORT viewport)
+{
+  const bool needsChange = (memcmp(&m_currentViewport, &viewport, sizeof(D3D11_VIEWPORT)) != 0);
+  if (needsChange)
+  {
+    memcpy(&m_currentViewport, &viewport, sizeof(D3D11_VIEWPORT));
+    m_deviceContext->RSSetViewports(1, &m_currentViewport);
+  }
+}
 
 RenderSystem::RenderSystem()
   : m_device(0)
@@ -12,7 +155,7 @@ RenderSystem::RenderSystem()
   , m_backBufferDSV(0)
   , m_backBufferRTV(0)
   , m_isFullScreen(false)
-  , m_renderTargetDirtyMask(0)
+  , m_stateCache(0)
 {
 }
 
@@ -123,6 +266,8 @@ bool RenderSystem::init(void* windowHandle, const InitParams& params)
     factory->Release();
   }
 
+  m_stateCache = new PipelineStateCache(m_renderContext);
+
   createFrameBuffer();
 
   initDefaultResources();
@@ -132,6 +277,9 @@ bool RenderSystem::init(void* windowHandle, const InitParams& params)
 
 void RenderSystem::shutdown()
 {
+  delete m_stateCache;
+  m_stateCache = 0;
+
   if (m_isFullScreen && m_swapChain)
     m_swapChain->SetFullscreenState(FALSE, NULL);
 
@@ -180,16 +328,9 @@ void RenderSystem::createFrameBuffer()
     VALIDATE(m_device->CreateDepthStencilView(m_depthBuffer, &descDSV, &m_backBufferDSV));
   }
 
-  m_renderContext->OMSetRenderTargets(1, &m_backBufferRTV, m_backBufferDSV);
+  m_stateCache->setRenderTargets(1, &m_backBufferRTV, m_backBufferDSV);
 
-  D3D11_VIEWPORT vp = {0};
-  vp.Width = (FLOAT)sd.BufferDesc.Width;
-  vp.Height = (FLOAT)sd.BufferDesc.Height;
-  vp.MaxDepth = 1.0f;
-  vp.MinDepth = 0.0f;
-  vp.TopLeftX = 0.0f;
-  vp.TopLeftY = 0.0f;
-  m_renderContext->RSSetViewports(1, &vp);
+  setViewport((float)sd.BufferDesc.Width, (float)sd.BufferDesc.Height);
 }
 
 void RenderSystem::releaseFrameBuffer()
@@ -244,7 +385,12 @@ void RenderSystem::endFrame()
 
 void RenderSystem::beginRenderTargetSetup()
 {
+  for (uint32 i = 0; i < MAX_RENDER_TARGETS; ++i)
+  {
+    m_boundRenderTargets[i] = 0;
+  }
 
+  m_boundDepthStencilTarget = 0;
 }
 
 #define DEPTH_STENCIL_TARGET_BIT (MAX_RENDER_TARGETS+1)
@@ -255,16 +401,14 @@ void RenderSystem::bindRenderTarget(uint32 slotMask, const SharedPtr<RenderTarge
   {
     ASSERT(renderTarget->getDefaultDSV() != 0, "target is not a depthstencil target");
     m_boundDepthStencilTarget = renderTarget;
-    m_renderTargetDirtyMask |= (1 << DEPTH_STENCIL_TARGET_BIT);
   }
   else
   {
-    for (uint32 i = RT_RENDER_TARGET0, slot = 0; i < RT_RENDER_TARGET8 && slotMask != 0; i <<= 1, ++slot)
+    for (uint32 i = RT_RENDER_TARGET0, slot = 0; i < RT_RENDER_TARGET7 && slotMask != 0; i <<= 1, ++slot)
     {
       if ((slotMask & i) && (m_boundRenderTargets[slot] != renderTarget))
       {
         m_boundRenderTargets[slot] = renderTarget;
-        m_renderTargetDirtyMask |= i;
         slotMask &= ~i;
       }
     }
@@ -273,30 +417,32 @@ void RenderSystem::bindRenderTarget(uint32 slotMask, const SharedPtr<RenderTarge
 
 void RenderSystem::endRenderTargetSetup()
 {
-  if (m_renderTargetDirtyMask != 0)
+  ID3D11RenderTargetView* renderTargetViews[MAX_RENDER_TARGETS] = {0};
+
+  uint32 numRenderTargets = 0;
+
+  for (uint32 i = 0; i < MAX_RENDER_TARGETS; ++i)
   {
-    ID3D11RenderTargetView* renderTargetViews[MAX_RENDER_TARGETS] = {0};
-
-    uint32 numRenderTargets = 0;
-
-    for (uint32 i = 0; i < MAX_RENDER_TARGETS; ++i)
+    renderTargetViews[i] = m_boundRenderTargets[i] ? m_boundRenderTargets[i]->getDefaultRTV() : 0;
+    if (renderTargetViews[i])
     {
-      if (m_renderTargetDirtyMask & (1 << i))
-      {
-        numRenderTargets = i+1;
-      }
-
-      renderTargetViews[i] = m_boundRenderTargets[i] ? m_boundRenderTargets[i]->getDefaultRTV() : 0;
+      numRenderTargets = i+1;
     }
-
-    if (numRenderTargets > 0 || (m_renderTargetDirtyMask & DEPTH_STENCIL_TARGET_BIT) != 0)
-    {
-      m_renderContext->OMSetRenderTargets(numRenderTargets, renderTargetViews,  
-        m_boundDepthStencilTarget ? m_boundDepthStencilTarget->getDefaultDSV() : 0);
-    }
-
-    m_renderTargetDirtyMask = 0;
   }
+
+  if (numRenderTargets > 0)
+  {
+    m_stateCache->setRenderTargets(numRenderTargets, renderTargetViews, 
+      m_boundDepthStencilTarget ? m_boundDepthStencilTarget->getDefaultDSV() : 0);
+  }
+}
+
+void RenderSystem::setShaderDrawBundle(const ShaderDrawBundle* shaderDrawBundle)
+{
+  ASSERT(shaderDrawBundle != 0, "invalid value");
+  m_stateCache->setVertexShader(*shaderDrawBundle->getVertexShader());
+  m_stateCache->setPixelShader(*shaderDrawBundle->getPixelShader());
+  m_stateCache->setInputLayout(shaderDrawBundle->getInputLayout());
 }
 
 void RenderSystem::initDefaultResources()
@@ -305,8 +451,78 @@ void RenderSystem::initDefaultResources()
 
 void RenderSystem::setRasterizerState(ID3D11RasterizerState* rasterizerState)
 {
-  ASSERT(rasterizerState != 0, "invalid value");
-  m_renderContext->RSSetState(rasterizerState);
+  m_stateCache->setRasterizerState(rasterizerState);
+}
+
+void RenderSystem::setDepthStencilState(ID3D11DepthStencilState* depthStencilState, uint8 stencilRef)
+{
+  m_stateCache->depthStencilState(depthStencilState, stencilRef);
+}
+
+void RenderSystem::setViewport(float width, float height, float topLeftX, float topLeftY, float minZ, float maxZ)
+{
+  D3D11_VIEWPORT vp = 
+  {
+    topLeftX, topLeftY,
+    width, height,
+    minZ, maxZ
+  };
+
+  m_stateCache->setViewport(vp);
+}
+
+void RenderSystem::debugEventPush(const char* name, uint32 color)
+{
+#if defined (SUPPORT_GPU_DEBUG_MARKERS)
+  WCHAR buffer[255] = {0};
+  MultiByteToWideChar(CP_ACP, 0, name, -1, buffer, 255);
+
+  ID3DUserDefinedAnnotation* annotation = 0;
+  if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (void**)&annotation)))
+  {
+    annotation->BeginEvent(buffer);
+    annotation->Release();
+  }
+  else
+  {
+    D3DPERF_BeginEvent(color, buffer);
+  }
+#endif // SUPPORT_GPU_DEBUG_MARKERS
+}
+
+void RenderSystem::debugEventPop()
+{
+#if defined (SUPPORT_GPU_DEBUG_MARKERS)
+  ID3DUserDefinedAnnotation* annotation = 0;
+  if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (void**)&annotation)))
+  {
+    annotation->EndEvent();
+    annotation->Release();
+  }
+  else
+  {
+    D3DPERF_EndEvent();
+  }
+#endif // SUPPORT_GPU_DEBUG_MARKERS
+}
+
+void RenderSystem::debugMarker(const char* name, uint32 color)
+{
+#if defined (SUPPORT_GPU_DEBUG_MARKERS)
+  WCHAR buffer[255] = {0};
+  MultiByteToWideChar(CP_ACP, 0, name, -1, buffer, 255);
+
+  ID3DUserDefinedAnnotation* annotation = 0;
+  if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (void**)&annotation)))
+  {
+    annotation->SetMarker(buffer);
+    annotation->Release();
+  }
+  else
+  {
+    D3DPERF_SetMarker(color, buffer);
+  }
+#endif // SUPPORT_GPU_DEBUG_MARKERS
 }
 
 struct IncludeHandler : public ID3DInclude

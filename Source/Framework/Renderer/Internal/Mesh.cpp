@@ -42,8 +42,8 @@ void Mesh::render(const Matrix4& view, const Matrix4& proj)
 
   RENDER_CONTEXT->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-  ShaderDrawBundle::createShaderDrawBundle(m_vertexShader, m_pixelShader, m_vertexDeclaration)
-    -> bindToPipeline();
+  SharedPtr<ShaderDrawBundle> shaderDrawBundle = ShaderDrawBundle::createShaderDrawBundle(m_vertexShader, m_pixelShader, m_vertexDeclaration);
+  g_Game->getRenderSystem()->setShaderDrawBundle(shaderDrawBundle.get());
 
   for (std::vector<MeshChunk*>::iterator it = m_meshChunks.begin();
     it != m_meshChunks.end(); ++it)

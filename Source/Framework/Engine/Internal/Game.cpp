@@ -6,6 +6,7 @@
 #include "InitParams.h"
 #include "DebugGeometryRenderer.h"
 #include "GameClient.h"
+#include "StringUtils.h"
 
 // unit tests
 #include "PtrTest.h"
@@ -21,23 +22,23 @@ Game::Game()
 
 Game::~Game()
 {
-//  delete m_renderSystem;
-//  delete m_inputSystem;
-//#if defined (_DEBUG)
-//  delete m_debugGeomRenderer;
-//#endif // _DEBUG
 }
 
 bool Game::init(InitParams& params)
 {
-  char path[MAX_PATH] = {0};
-  if (GetCurrentDirectory(MAX_PATH, path) != 0)
+  // try setting up correct working directory
+  String relativeWorkingDir;
+  if (readAllFile("working_dir", relativeWorkingDir))
   {
-    printf("starting in '%s'\n", path);
+    String currentDir = getCurrentDirectory();
+    if (!StringUtils::endsWith(currentDir, "/") && !StringUtils::endsWith(currentDir, "\\"))
+      currentDir += "/";
+    currentDir += relativeWorkingDir;
+    setCurrentDirectory(currentDir);
   }
 
   // run unit tests
-  PtrTest::TestSharedPointer<PT_FAST>();
+  //PtrTest::TestSharedPointer<PT_FAST>();
 
   if (!initGame(params))
     return false;
@@ -87,7 +88,7 @@ void Game::run()
       m_inputSystem->tick(0);
 
 #if defined (_DEBUG)
-      //m_debugGeomRenderer->prepareDebugRendering();
+      m_debugGeomRenderer->prepareDebugRendering();
 #endif // _DEBUG
 
       m_client->tick(0);
@@ -96,10 +97,9 @@ void Game::run()
       m_client->render(0);
 
 #if defined (_DEBUG)
-      Matrix4 proj;
-      Matrix4 view;
-      //getViewParameters(view, proj);
-      //m_debugGeomRenderer->drawAllDebugGeometry(view, proj);
+      SceneView view;
+      m_client->getCurrentView(view);
+      m_debugGeomRenderer->drawAllDebugGeometry(view.m_viewMatrix, view.m_projectionMatrix);
 #endif // _DEBUG
 
       m_renderSystem->endFrame();

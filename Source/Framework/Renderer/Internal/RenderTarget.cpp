@@ -52,7 +52,7 @@ DXGI_FORMAT findAppropriateRenderTargetFormat(DXGI_FORMAT format, bool srgb = fa
     switch (format)
     {
     case DXGI_FORMAT_B8G8R8A8_TYPELESS:
-      return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+      return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
     case DXGI_FORMAT_BC1_TYPELESS:
       return DXGI_FORMAT_BC1_UNORM_SRGB;
     case DXGI_FORMAT_BC2_TYPELESS:
@@ -66,7 +66,7 @@ DXGI_FORMAT findAppropriateRenderTargetFormat(DXGI_FORMAT format, bool srgb = fa
     switch (format)
     {
     case DXGI_FORMAT_B8G8R8A8_TYPELESS:
-      return DXGI_FORMAT_B8G8R8X8_UNORM;
+      return DXGI_FORMAT_B8G8R8A8_UNORM;
     case DXGI_FORMAT_BC1_TYPELESS:
       return DXGI_FORMAT_BC1_UNORM;
     case DXGI_FORMAT_BC2_TYPELESS:

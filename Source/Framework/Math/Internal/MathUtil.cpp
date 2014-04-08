@@ -1,21 +1,16 @@
 #include "Core.h"
 #include "MathUtil.h"
 
-#include "Matrix.h"
-#include "Vector.h"
-
-#include <cmath>
-
-void makePerspectiveProjMatrix(Matrix4& mat, float fovy, float aspect, float zn, float zf)
+void makePerspectiveProjMatrix(Matrix4& mat, float fovy, float aspect, float zNear, float zFar)
 {
-  float f = 1.0f / tan(fovy * 0.5f);
-  
-  mat = Matrix4::Zero;
-  mat[0]  = f / aspect;
-  mat[5]  = f;
-  mat[10] = zf / (zn - zf);
-  mat[11] =  zn * zf / (zn - zf);
-  mat[14] = -1;
+  const float f = 1.0f / tan(fovy * 0.5f);
+  const float scale = 1.0f / (zFar - zNear);
+
+  mat = Matrix4(
+    f / aspect, 0,  0,            0,
+    0,          f,  0,            0,
+    0,          0, zFar * scale, -zNear * zFar * scale,
+    0,          0,  1,            0);
 }
 
 void makeTranslation(Matrix4& mat, float x, float y, float z)
@@ -28,7 +23,7 @@ void makeTranslation(Matrix4& mat, float x, float y, float z)
 
 void makeLookAt(Matrix4& mat, const Vector3& origin, const Vector3& targetPoint, const Vector3& up)
 {
-  Vector3 axisZ = normalize(origin - targetPoint);
+  Vector3 axisZ = normalize(targetPoint - origin);
   Vector3 axisX = normalize(cross(up, axisZ));
   Vector3 axisY = cross(axisZ, axisX);
 
@@ -67,13 +62,6 @@ void makeRotateZ(Matrix4& mat, float angle)
   mat[0] = c; mat[1] = -s;
   mat[4] = s; mat[5] = c;
 }
-
-/**
-   0  1  2  3
-   4  5  6  7
-   8  9 10 11
-  12 13 14 15
-*/
 
 void setTransform(Matrix4& mat, float x, float y, float z)
 {

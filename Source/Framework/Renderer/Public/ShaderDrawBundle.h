@@ -7,7 +7,9 @@ public:
   ShaderDrawBundle();
   ~ShaderDrawBundle();
 
-  void bindToPipeline();
+  WeakPtr<VertexShader> getVertexShader() const { return m_vertexShader; }
+  WeakPtr<PixelShader> getPixelShader() const { return m_pixelShader; }
+  ID3D11InputLayout* getInputLayout() const { return m_inputLayout; }
 
   static SharedPtr<ShaderDrawBundle> createShaderDrawBundle(SharedPtr<VertexShader> vertexShader, SharedPtr<PixelShader> pixelShader, SharedPtr<const VertexDeclaration> vertexDeclaration);
 
