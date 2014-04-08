@@ -7,15 +7,15 @@
 *.user
 
 # Ignore all assets/data
-#/Data/Meshes/**
-#/Data/Shaders/**
-#/Data/Textures/**
+/Data/Meshes/**
+/Data/Shaders/**
+/Data/Textures/**
 
 # Intermediate created files
 /ipch/**
 
 # Ignore binary files
-#/Binaries/Build/**
+/Binaries/Build/**
 
 # Ignore test applications 
 /Source/Applications/**
