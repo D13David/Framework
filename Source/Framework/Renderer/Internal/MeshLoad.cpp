@@ -30,7 +30,7 @@ bool Mesh::loadFromObj(const String& filename, Mesh& mesh)
   if (!readRawBlob(filename, data))
     return false;
 
-  String path = PathUtils::getPath(filename, false);
+  String path = PathUtils::getPath(filename, false) + "\\";
 
   String materialLib;
   std::vector<float> positions;
@@ -86,8 +86,8 @@ bool Mesh::loadFromObj(const String& filename, Mesh& mesh)
         y = (float)strtod(next, &next);
         z = (float)strtod(next, 0);
         positions.push_back(x);
-        positions.push_back(y);
         positions.push_back(z);
+        positions.push_back(y);
       }
     }
     else if (!strncmp(last, "mtllib", 6))
@@ -194,18 +194,18 @@ bool Mesh::loadFromObj(const String& filename, Mesh& mesh)
     while (*curr != '\n' && curr < end)
       ++curr;
 
-    if (last[0] == 'g')
-    {
-      const char* nameEnd = curr;
-      while (*nameEnd <= ' ')
-        --nameEnd;
+    //if (last[0] == 'g')
+    //{
+    //  const char* nameEnd = curr;
+    //  while (*nameEnd <= ' ')
+    //    --nameEnd;
 
-      last += 2; // g tag
-      currentSubmeshName = String(last, nameEnd-last+1);
-      group = new geometryGroup();
-      indices.insert(std::make_pair(currentSubmeshName, group));
-    }
-    else if (!strncmp(last, "usemtl", 6))
+    //  last += 2; // g tag
+    //  currentSubmeshName = String(last, nameEnd-last+1);
+    //  group = new geometryGroup();
+    //  indices.insert(std::make_pair(currentSubmeshName, group));
+    //}
+    if (!strncmp(last, "usemtl", 6))
     {
       const char* nameEnd = curr;
       while (*nameEnd <= ' ')
@@ -213,14 +213,24 @@ bool Mesh::loadFromObj(const String& filename, Mesh& mesh)
 
       last += 7; // g tag
       String materialName = String(last, nameEnd-last+1);
+
+      String groupName = materialName;
+      uint32 duplicateIndex = 0;
+      group = new geometryGroup();
+      do 
+      {
+        std::map<String, geometryGroup*>::iterator it = indices.find(groupName);
+        if (it == indices.end())
+          break;
+        groupName = materialName + StringUtils::toString(duplicateIndex++);
+      } while (true);
+
+      indices.insert(std::make_pair(groupName, group));
+
       std::map<String, materialParameters>::iterator matLibIt = materials.find(materialName);
       if (matLibIt != materials.end())
       {
         group->material = &matLibIt->second;
-      }
-      else
-      {
-        int sdf = 0;
       }
     }
     else if (last[0] == 'f')
@@ -282,9 +292,8 @@ bool Mesh::loadFromObj(const String& filename, Mesh& mesh)
   bool hasTexcoords = texcoords.size() > 0;
   bool hasTangent = false;
 
-  int maxMeshes = 70;
   for (std::map<String, geometryGroup*>::iterator it = indices.begin();
-    it != indices.end(), maxMeshes > 0; ++it, --maxMeshes)
+    it != indices.end(); ++it)
   {
     IntermediateMeshData data, finalMeshData;
 
@@ -297,8 +306,8 @@ bool Mesh::loadFromObj(const String& filename, Mesh& mesh)
 
       while (numVertices > 0)
       {
-        const vertexIndex& index2 = it->second->indices[j++];
-        const vertexIndex& index1 = it->second->indices[j];
+        const vertexIndex& index1 = it->second->indices[j++];
+        const vertexIndex& index2 = it->second->indices[j];
 
         data.position.push_back(Vector3(positions[index0.posIndex*3+0],
           positions[index0.posIndex*3+1], positions[index0.posIndex*3+2]));

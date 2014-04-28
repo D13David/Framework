@@ -114,6 +114,9 @@
     <ClCompile Include="Core\Internal\StringUtils.cpp">
       <Filter>Core\Internal</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Internal\SystemTextures.cpp">
+      <Filter>Renderer\Internal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Public\Game.h">
@@ -197,6 +200,12 @@
     <ClInclude Include="Renderer\Public\RenderTarget.h">
       <Filter>Renderer\Public</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\Public\SystemTextures.h">
+      <Filter>Renderer\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Internal\RendererUtils.h">
+      <Filter>Renderer\Internal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Data\Shaders\debug.hlsl">
@@ -209,6 +218,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="..\..\Data\Shaders\terrain.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\Data\Shaders\DeferredRendering.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

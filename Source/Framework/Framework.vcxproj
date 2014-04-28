@@ -34,6 +34,7 @@
     <ClCompile Include="Renderer\Internal\ResourceManager.cpp" />
     <ClCompile Include="Renderer\Internal\Shader.cpp" />
     <ClCompile Include="Renderer\Internal\ShaderDrawBundle.cpp" />
+    <ClCompile Include="Renderer\Internal\SystemTextures.cpp" />
     <ClCompile Include="Renderer\Internal\Texture.cpp" />
     <ClCompile Include="Renderer\Internal\VertexDeclaration.cpp" />
   </ItemGroup>
@@ -52,6 +53,7 @@
     <ClInclude Include="Math\Public\Matrix.h" />
     <ClInclude Include="Math\Public\Point.h" />
     <ClInclude Include="Math\Public\Vector.h" />
+    <ClInclude Include="Renderer\Internal\RendererUtils.h" />
     <ClInclude Include="Renderer\Public\Buffer.h" />
     <ClInclude Include="Renderer\Public\DebugGeometryRenderer.h" />
     <ClInclude Include="Renderer\Public\Mesh.h" />
@@ -63,6 +65,7 @@
     <ClInclude Include="Renderer\Public\ResourceManager.h" />
     <ClInclude Include="Renderer\Public\Shader.h" />
     <ClInclude Include="Renderer\Public\ShaderDrawBundle.h" />
+    <ClInclude Include="Renderer\Public\SystemTextures.h" />
     <ClInclude Include="Renderer\Public\Texture.h" />
     <ClInclude Include="Renderer\Public\VertexDeclaration.h" />
   </ItemGroup>
@@ -71,6 +74,13 @@
     <None Include="..\..\Data\Shaders\renderMesh.hlsl" />
     <None Include="..\..\Data\Shaders\simple.hlsl" />
     <None Include="..\..\Data\Shaders\terrain.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Data\Shaders\DeferredRendering.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D2F86336-A68C-4C4E-A316-3196408D94B2}</ProjectGuid>

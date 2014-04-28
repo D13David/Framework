@@ -21,6 +21,13 @@ public:
 
     return true;
   }
+
+  static String toString(uint32 value)
+  {
+    char buffer[512];
+    _itoa_s(value, buffer, 10);
+    return String(buffer);
+  }
 };
 
 class PathUtils

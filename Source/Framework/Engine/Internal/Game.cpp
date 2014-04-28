@@ -7,6 +7,7 @@
 #include "DebugGeometryRenderer.h"
 #include "GameClient.h"
 #include "StringUtils.h"
+#include "SystemTextures.h"
 
 // unit tests
 #include "PtrTest.h"
@@ -59,6 +60,8 @@ bool Game::init(InitParams& params)
   m_debugGeomRenderer = new DebugGeometryRenderer();
   m_debugGeomRenderer->init();
 #endif // _DEBUG
+
+  SystemTextures::init();
 
   m_client->initResources();
 

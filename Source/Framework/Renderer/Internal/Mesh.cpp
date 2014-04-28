@@ -7,6 +7,7 @@
 #include "VertexDeclaration.h"
 #include "ShaderDrawBundle.h"
 #include "Shader.h"
+#include "SystemTextures.h"
 
 Mesh::Mesh()
 {
@@ -52,6 +53,11 @@ void Mesh::render(const Matrix4& view, const Matrix4& proj)
 
     // material
     Texture* texture = chunk->m_diffuseMap;
+    if (!texture)
+    {
+      texture = SystemTextures::Default.get();
+    }
+
     if (texture)
     {
       ID3D11ShaderResourceView* srv = texture->getDefaultSRV();

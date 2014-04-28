@@ -2,92 +2,7 @@
 #include "RenderTarget.h"
 #include "RenderSystem.h"
 #include "Game.h"
-
-DXGI_FORMAT mapPixelFormat(ePixelFormat format)
-{
-  switch (format)
-  {
-  case PF_B8G8R8A8: return DXGI_FORMAT_B8G8R8A8_TYPELESS;
-  case PF_R16G16: return DXGI_FORMAT_R16G16_UNORM;
-  case PF_A2B10G10R10: return DXGI_FORMAT_R10G10B10A2_UNORM;
-  case PF_A16B16G16R16: return DXGI_FORMAT_R16G16B16A16_UNORM;
-  case PF_DEPTHSTENCIL: return DXGI_FORMAT_R24G8_TYPELESS;
-  case PF_SHADOW_DEPTH: return DXGI_FORMAT_D16_UNORM;
-  case PF_R32G32B32A32_FLOAT: return DXGI_FORMAT_R32G32B32A32_FLOAT;
-  case PF_R32G32B32_FLOAT: return DXGI_FORMAT_R32G32B32_FLOAT;
-  case PF_R16G16B16A16_FLOAT: return DXGI_FORMAT_R16G16B16A16_FLOAT;
-  case PF_R11G11A10_FLOAT: return DXGI_FORMAT_R11G11B10_FLOAT;
-  case PF_R16G16_FLOAT: return DXGI_FORMAT_R16G16_FLOAT;
-  case PF_R32G32_FLOAT: return DXGI_FORMAT_R32G32_FLOAT;
-  case PF_R16_FLOAT: return DXGI_FORMAT_R16_FLOAT;
-  case PF_R32_FLOAT: return DXGI_FORMAT_R32_FLOAT;
-  case PF_BC1: return DXGI_FORMAT_BC1_TYPELESS;
-  case PF_BC2: return DXGI_FORMAT_BC2_TYPELESS;
-  case PF_BC3: return DXGI_FORMAT_BC3_TYPELESS;
-  case PF_BC4: return DXGI_FORMAT_BC4_UNORM;
-  }
-
-  return DXGI_FORMAT_UNKNOWN;
-}
-
-DXGI_FORMAT findAppropriateDepthStencilFormat(DXGI_FORMAT format)
-{
-  switch (format)
-  {
-  case DXGI_FORMAT_R24G8_TYPELESS:
-    return DXGI_FORMAT_D24_UNORM_S8_UINT;
-  case DXGI_FORMAT_R32_TYPELESS:
-    return DXGI_FORMAT_D32_FLOAT;
-  case DXGI_FORMAT_R16_TYPELESS:
-    return DXGI_FORMAT_D16_UNORM;
-  }
-
-  return format;
-}
-
-DXGI_FORMAT findAppropriateRenderTargetFormat(DXGI_FORMAT format, bool srgb = false)
-{
-  if (srgb)
-  {
-    switch (format)
-    {
-    case DXGI_FORMAT_B8G8R8A8_TYPELESS:
-      return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
-    case DXGI_FORMAT_BC1_TYPELESS:
-      return DXGI_FORMAT_BC1_UNORM_SRGB;
-    case DXGI_FORMAT_BC2_TYPELESS:
-      return DXGI_FORMAT_BC2_UNORM_SRGB;
-    case DXGI_FORMAT_BC3_TYPELESS:
-      return DXGI_FORMAT_BC3_UNORM_SRGB;
-    }
-  }
-  else
-  {
-    switch (format)
-    {
-    case DXGI_FORMAT_B8G8R8A8_TYPELESS:
-      return DXGI_FORMAT_B8G8R8A8_UNORM;
-    case DXGI_FORMAT_BC1_TYPELESS:
-      return DXGI_FORMAT_BC1_UNORM;
-    case DXGI_FORMAT_BC2_TYPELESS:
-      return DXGI_FORMAT_BC2_UNORM;
-    case DXGI_FORMAT_BC3_TYPELESS:
-      return DXGI_FORMAT_BC3_UNORM;
-    }
-  }
-
-  switch (format)
-  {
-  case DXGI_FORMAT_R24G8_TYPELESS:
-    return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-  case DXGI_FORMAT_R32_TYPELESS:
-    return DXGI_FORMAT_R32_FLOAT;
-  case DXGI_FORMAT_R16_TYPELESS:
-    return DXGI_FORMAT_R16_UNORM;
-  }
-
-  return format;
-}
+#include "RendererUtils.h"
 
 RenderTarget::RenderTarget()
   : m_texturePtr(0)
@@ -147,7 +62,7 @@ void RenderTarget::create(const RenderTargetCreationInfo& info)
 
   desc.MipLevels = 0;
   desc.ArraySize = 1;
-  desc.Format = mapPixelFormat(info.pixelFormat);
+  desc.Format = mapPixelFormatForRendertarget(info.pixelFormat);
   desc.SampleDesc.Quality = 0;
   desc.SampleDesc.Count = 1;
   desc.Usage = D3D11_USAGE_DEFAULT;

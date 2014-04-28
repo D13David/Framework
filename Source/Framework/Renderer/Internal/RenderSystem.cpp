@@ -527,6 +527,28 @@ void RenderSystem::debugMarker(const char* name, uint32 color)
 
 struct IncludeHandler : public ID3DInclude
 {
+public:
+  IncludeHandler()
+  {
+  }
+  STDMETHOD(Open)(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID *ppData, UINT *pBytes)
+  {
+    DataBlob blob;
+    if (readRawBlob(pFileName, blob))
+    {
+      *ppData = malloc(blob.getSize());
+      memcpy((void*)*ppData, blob.getPtr(), blob.getSize());
+      *pBytes = blob.getSize();
+    }
+
+    return S_OK;
+  }
+
+  STDMETHOD(Close)(LPCVOID pData)
+  {
+    free((void*)pData);
+    return S_OK;
+  }
 };
 
 bool ShaderCompiler::compile(const String& fileName, const String& entryPoint, const String& target, DataBlob& byteCode)
@@ -543,9 +565,10 @@ bool ShaderCompiler::compile(const String& fileName, const String& entryPoint, c
   flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #endif // _DEBUG
 
+  IncludeHandler includeHandler;
   ID3DBlob* shaderByteCode = 0;
   ID3DBlob* errorMsgs = 0;
-  if (FAILED(D3DCompile(buffer.getPtr(), buffer.getSize(), NULL, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+  if (FAILED(D3DCompile(buffer.getPtr(), buffer.getSize(), NULL, NULL, &includeHandler,
     entryPoint.c_str(), target.c_str(), flags, 0, &shaderByteCode, &errorMsgs)))
   {
     // parse error message

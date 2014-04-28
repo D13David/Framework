@@ -3,6 +3,7 @@
 #include "StringUtils.h"
 #include "Game.h"
 #include "RenderSystem.h"
+#include "RendererUtils.h"
 
 #define ORIGX_RIGHT 0x08
 #define ORIGY_BOTTOM 0x10
@@ -64,6 +65,83 @@ bool Texture::load(const String& fileName)
 
 void Texture::unload()
 {
+}
+
+void Texture::create(const TextureCreationInfo& info)
+{
+  if (info.type == TT_TEXTURE_2D || info.type == TT_TEXTURE_CUBE)
+  {
+    D3D11_TEXTURE2D_DESC desc = {0};
+    desc.Width = info.width;
+    desc.Height = info.height;
+
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    if (info.flags & TF_USAGE_STATIC && info.data)
+    {
+      desc.Usage = D3D11_USAGE_IMMUTABLE;
+    }
+    else if (info.flags & TF_USAGE_DYNAMIC)
+    {
+      desc.Usage = D3D11_USAGE_DYNAMIC;
+    }
+    else if (info.flags & TF_USAGE_STAGING)
+    {
+      desc.Usage = D3D11_USAGE_STAGING;
+    }
+
+    const bool isStaging = desc.Usage == D3D11_USAGE_STAGING;
+
+    desc.ArraySize = max<uint32>(info.arraySize, 1);
+    desc.BindFlags = isStaging ? 0 : D3D11_BIND_SHADER_RESOURCE;
+
+    if (info.flags & TF_GPU_WRITE_ACCESS)
+    {
+      desc.BindFlags |= isStaging ? 0 : D3D11_BIND_UNORDERED_ACCESS;
+    }
+
+    desc.CPUAccessFlags = isStaging ? D3D11_CPU_ACCESS_READ : 0;
+    desc.MipLevels = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.SampleDesc.Count = 1;
+    desc.Format = mapPixelFormatForTexture(info.format);
+    desc.MiscFlags = 0;
+
+    if (info.type == TT_TEXTURE_CUBE)
+    {
+      desc.ArraySize = 6;
+      desc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
+    }
+
+    ID3D11Texture2D* resource;
+    if (info.data)
+    {
+      D3D11_SUBRESOURCE_DATA data = {0};
+      data.pSysMem = info.data;
+      data.SysMemPitch = info.width * calcPitchForFormat(desc.Format);
+      VALIDATE(RENDER_DEVICE->CreateTexture2D(&desc, &data, &resource));
+    }
+    else
+    {
+      VALIDATE(RENDER_DEVICE->CreateTexture2D(&desc, 0, &resource));
+    }
+
+    m_resource = resource;
+
+    if (!isStaging)
+    {
+      D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+      ::ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+      srvDesc.Format = desc.Format;
+      srvDesc.Texture2D.MipLevels = desc.MipLevels;
+      srvDesc.Texture2D.MostDetailedMip = 0;
+      srvDesc.ViewDimension = info.type == TT_TEXTURE_CUBE ? D3D11_SRV_DIMENSION_TEXTURECUBE : D3D11_SRV_DIMENSION_TEXTURE2D;
+      VALIDATE(RENDER_DEVICE->CreateShaderResourceView(m_resource, &srvDesc, &m_defaultSRV));
+    }
+  }
+  else
+  {
+    // FIXME: implement
+  }
 }
 
 bool Texture::loadTarga(const DataBlob& data)
