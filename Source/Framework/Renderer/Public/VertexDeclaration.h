@@ -1,27 +1,7 @@
 #ifndef __VertexDeclaration_h_
 #define __VertexDeclaration_h_
 
-enum eVertexElementFormat
-{
-  VEF_NONE,
-  // 32 bit float formats
-  VEF_FLOAT1,
-  VEF_FLOAT2,
-  VEF_FLOAT3,
-  VEF_FLOAT4,
-  // 16 bit float formats
-  VEF_HALF1,
-  VEF_HALF2,
-  VEF_HALF4,
-  // 16 bit integer formats
-  VEF_SHORT2,
-  VEF_SHORT4,
-  VEF_SHORT4N,
-  // special formats
-  VEF_COLOR,
-
-  VEF_MAX
-};
+#include "RenderSystemPrerequisites.h"
 
 struct VertexElement
 {

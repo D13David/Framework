@@ -25,6 +25,23 @@ struct VertexBufferCreationInfo
   void* data;
 };
 
+struct IndexBufferCreationInfo
+{
+  uint32 size;
+  bool use32BitIndices;
+  bool dynamic;
+  bool shadowed;
+  void* data;
+};
+
+struct BufferInfo
+{
+  uint32 canRead : 1;
+  uint32 canWrite : 1;
+  uint32 mapped : 1;
+  uint32 dynamic : 1;
+};
+
 class VertexBuffer
 {
 public:
@@ -42,14 +59,27 @@ public:
 private:
   ID3D11Buffer* m_resource;
   void* m_backingStore;
+  BufferInfo m_bufferInfo;
+  eBufferMapOptions m_mapOptions;
+};
 
-  struct BufferInfo
-  {
-    uint32 canRead : 1;
-    uint32 canWrite : 1;
-    uint32 mapped : 1;
-    uint32 dynamic : 1;
-  };
+class IndexBuffer
+{
+public:
+  IndexBuffer();
+  explicit IndexBuffer(const IndexBufferCreationInfo& info);
+  ~IndexBuffer();
+
+  ID3D11Buffer* getResourcePtr() { return m_resource;  }
+
+  void create(const IndexBufferCreationInfo& info);
+  void destroy();
+  void* map(eBufferMapOptions mapOption);
+  void unmap();
+
+private:
+  ID3D11Buffer* m_resource;
+  void* m_backingStore;
   BufferInfo m_bufferInfo;
   eBufferMapOptions m_mapOptions;
 };

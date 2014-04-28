@@ -1,20 +1,22 @@
 #ifndef __Mesh_h_
 #define __Mesh_h_
 
-//#include "Shader.h"
+#include "RenderSystemPrerequisites.h"
+
+#include "VertexDeclaration.h"
 
 #define MAX_VERTEX_STREAMS 5
 
 struct IntermediateMeshData
 {
-  std::vector<Vector3> position;
-  std::vector<Vector3> normal;
-  std::vector<Vector3> tangent;
-  std::vector<Vector3> bitangent;
-  std::vector<Vector2> uv0;
-  std::vector<Vector2> uv1;
-  std::vector<Vector2> uv2;
-  std::vector<uint32> indices;
+  Array<Vector3> position;
+  Array<Vector3> normal;
+  Array<Vector3> tangent;
+  Array<Vector3> bitangent;
+  Array<Vector2> uv0;
+  Array<Vector2> uv1;
+  Array<Vector2> uv2;
+  Array<uint32> indices;
 };
 
 enum eMeshOptions
@@ -42,8 +44,10 @@ private:
   uint32 vertexSize;
   ID3D11Buffer* streams[MAX_VERTEX_STREAMS];
   ID3D11Buffer* indices;
+  //-->
   Texture* m_diffuseMap;
   Texture* m_bumpMap;
+  //<--
 };
 
 class Mesh
@@ -66,13 +70,14 @@ private:
   static MeshChunk* createMeshChunk(const IntermediateMeshData& data, Mesh& mesh);
 
   // mesh parts
-  std::vector<MeshChunk*> m_meshChunks;
+  Array<MeshChunk*> m_meshChunks;
   // vertex declaration
   SharedPtr<VertexDeclaration> m_vertexDeclaration;
 
-  // only dummy data
+  // only dummy data -->
   SharedPtr<VertexShader> m_vertexShader;
   SharedPtr<PixelShader> m_pixelShader;
+  // <--
 };
 
 #endif // __Mesh_h_

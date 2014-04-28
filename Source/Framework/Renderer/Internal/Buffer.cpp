@@ -31,6 +31,8 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::create(const VertexBufferCreationInfo& info)
 {
+  destroy();
+
   if (info.size == 0)
     return;
 
@@ -159,6 +161,148 @@ void VertexBuffer::unmap()
     return;
 
   
+  if (!m_bufferInfo.dynamic && m_backingStore)
+  {
+    if (m_mapOptions != D3D11_MAP_READ)
+      RENDER_CONTEXT->UpdateSubresource(m_resource, 0, NULL, m_backingStore, 0, 0);
+  }
+  else
+  {
+    RENDER_CONTEXT->Unmap(m_resource, 0);
+  }
+
+  m_bufferInfo.mapped = false;
+}
+
+
+IndexBuffer::IndexBuffer()
+  : m_resource(0)
+  , m_backingStore(0)
+{
+  m_bufferInfo.canRead = false;
+  m_bufferInfo.canWrite = false;
+  m_bufferInfo.mapped = false;
+  m_bufferInfo.dynamic = false;
+}
+
+IndexBuffer::IndexBuffer(const IndexBufferCreationInfo& info)
+  : m_resource(0)
+  , m_backingStore(0)
+{
+  m_bufferInfo.canRead = false;
+  m_bufferInfo.canWrite = false;
+  m_bufferInfo.mapped = false;
+  m_bufferInfo.dynamic = false;
+  create(info);
+}
+
+IndexBuffer::~IndexBuffer()
+{
+  destroy();
+}
+
+void IndexBuffer::create(const IndexBufferCreationInfo& info)
+{
+  destroy();
+
+  if (info.size == 0)
+    return;
+
+  D3D11_BUFFER_DESC desc = {0};
+  desc.ByteWidth = info.size;
+  desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+
+  if (info.dynamic)
+  {
+    m_bufferInfo.dynamic = true;
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+  }
+  else
+  {
+    desc.Usage = info.data 
+      ? D3D11_USAGE_IMMUTABLE
+      : D3D11_USAGE_DEFAULT;
+  }
+
+  D3D11_SUBRESOURCE_DATA data = {0};
+  data.pSysMem = info.data;
+
+  VALIDATE(RENDER_DEVICE->CreateBuffer(&desc, info.data ? &data : 0, &m_resource));
+
+  if (info.shadowed)
+  {
+    m_backingStore = malloc(info.size);
+    if (info.data)
+      memcpy(m_backingStore, info.data, info.size);
+
+    m_bufferInfo.canRead = false;
+    m_bufferInfo.canWrite = desc.CPUAccessFlags & D3D11_CPU_ACCESS_WRITE;
+
+  }
+  else
+  {
+    m_bufferInfo.canRead = false;
+    m_bufferInfo.canWrite = desc.CPUAccessFlags & D3D11_CPU_ACCESS_WRITE;
+  }
+}
+
+void IndexBuffer::destroy()
+{
+  SAFE_RELEASE(m_resource);
+  if (m_backingStore)
+  {
+    free(m_backingStore);
+    m_backingStore = 0;
+  }
+}
+
+void* IndexBuffer::map(eBufferMapOptions mapOption)
+{
+  if (m_bufferInfo.mapped)
+    return 0;
+
+  D3D11_MAP map;
+  switch (mapOption)
+  {
+  case BUFFER_MAP_READ: map = D3D11_MAP_READ; break;
+  case BUFFER_MAP_WRITE: map = D3D11_MAP_WRITE; break;
+  case BUFFER_MAP_WRITE_DISCARD: D3D11_MAP_WRITE_DISCARD; break;
+  case BUFFER_MAP_WRITE_NO_OVERWRITE: D3D11_MAP_WRITE_NO_OVERWRITE; break;
+  }
+
+  // check for valid map options
+  if ((map == D3D11_MAP_READ && !m_bufferInfo.canRead) ||
+    (map != D3D11_MAP_READ && !m_bufferInfo.canWrite))
+  {
+    return 0;
+  }
+  void* result = 0;
+
+  if (!m_bufferInfo.dynamic && m_backingStore)
+  {
+    result = m_backingStore;
+  }
+  else
+  {
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    if (SUCCEEDED(RENDER_CONTEXT->Map(m_resource, 0, map, 0, &mappedResource)))
+    {
+      result = mappedResource.pData;
+    }
+  }
+
+  m_bufferInfo.mapped = (result != 0);
+
+  return result;
+}
+
+void IndexBuffer::unmap()
+{
+  if (!m_bufferInfo.mapped)
+    return;
+
+
   if (!m_bufferInfo.dynamic && m_backingStore)
   {
     if (m_mapOptions != D3D11_MAP_READ)

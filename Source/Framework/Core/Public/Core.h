@@ -36,6 +36,9 @@ typedef unsigned short uint16;
 typedef unsigned int uint32;
 typedef unsigned char ubyte;
 
+template<typename T>
+class Array : public std::vector<T> {};
+
 class DataBlob
 {
 public:
@@ -86,6 +89,7 @@ struct ID3D11SamplerState;
 class DebugGeometryRenderer;
 class Game;
 class GameClient;
+class IndexBuffer;
 struct InitParams;
 class InputSystem;
 class PixelShader;
@@ -94,6 +98,7 @@ class RenderTarget;
 class Shader;
 class ShaderDrawBundle;
 class Texture;
+class VertexBuffer;
 class VertexDeclaration;
 class VertexShader;
 
